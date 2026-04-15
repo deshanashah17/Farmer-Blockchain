@@ -1,0 +1,442 @@
+{
+  "info": {
+    "name": "FarmerPay API",
+    "description": "Algorand-based escrow for farmer-buyer trades",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Status",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": [""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trades - CRUD",
+      "item": [
+        {
+          "name": "CREATE Trade",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmer_address\": \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HVY\",\n  \"verifier_address\": \"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBY2XFGQ\",\n  \"crop_type\": \"rice\",\n  \"quantity_kg\": 100,\n  \"price_per_kg\": 50.0,\n  \"delivery_deadline\": 1704067200\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/trades",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades"]
+            }
+          }
+        },
+        {
+          "name": "LIST Trades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades?status=active",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Trade Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Trade Status (Lightweight)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "status"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trades - Transactions",
+      "item": [
+        {
+          "name": "BUILD create_trade txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/build-create-txn",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "build-create-txn"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD fund_escrow txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/fund",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "fund"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD mark_delivered txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/deliver",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "deliver"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD confirm_delivery txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/confirm",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "confirm"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD raise_dispute txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/dispute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "dispute"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD vote_dispute txn",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vote_for_farmer\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/vote-dispute",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "vote-dispute"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BUILD claim_refund txn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/refund",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "refund"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trades - Submit Signed Txn",
+      "item": [
+        {
+          "name": "SUBMIT Signed Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signed_txn\": \"base64_encoded_signed_transaction_bytes\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/submit-txn",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "submit-txn"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trades - State Management",
+      "item": [
+        {
+          "name": "ACCEPT Trade (Farmer)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/accept",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "accept"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "VERIFY Contract (Verifier)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/verify",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "verify"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "WITHDRAW Funds (Violated)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/:trade_id/withdraw",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", ":trade_id", "withdraw"],
+              "variable": [
+                {
+                  "key": "trade_id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Verifier Routes",
+      "item": [
+        {
+          "name": "GET Pending Verification",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4000/api/trades/pending-verification",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "trades", "pending-verification"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reference Info",
+      "item": [
+        {
+          "name": "Contract APP_ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://testnet-api.algonode.cloud/v2/applications/757797076",
+              "protocol": "https",
+              "host": ["testnet-api", "algonode", "cloud"],
+              "path": ["v2", "applications", "757797076"]
+            }
+          }
+        },
+        {
+          "name": "Testnet Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://testnet-api.algonode.cloud/health",
+              "protocol": "https",
+              "host": ["testnet-api", "algonode", "cloud"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

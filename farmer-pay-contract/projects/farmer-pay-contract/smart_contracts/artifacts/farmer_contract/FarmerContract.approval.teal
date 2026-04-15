@@ -1,0 +1,598 @@
+#pragma version 11
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 0 1 2 8
+    bytecblock "state" "buyer_address" "farmer_address" "amount" "dispute_votes_farmer" "dispute_votes_buyer" "verifier_address" "delivery_deadline"
+    // smart_contracts/farmer_contract/contract.py:5
+    // class FarmerContract(ARC4Contract):
+    txn NumAppArgs
+    bz main___algopy_default_create@15
+    txn OnCompletion
+    !
+    assert
+    txn ApplicationID
+    assert
+    pushbytess 0x9eb5e36a 0xb3607043 0x5e23d57e 0xff4966a6 0x4398265d 0x7b3579ab 0x02648f55 0xb016f2b9 // method "create_trade(string,address,address,uint64,uint64)void", method "fund_escrow()void", method "mark_delivered()void", method "confirm_delivery()void", method "raise_dispute()void", method "vote_dispute(uint64)void", method "claim_refund()void", method "cancel_trade()void"
+    txna ApplicationArgs 0
+    match create_trade fund_escrow mark_delivered confirm_delivery raise_dispute vote_dispute claim_refund cancel_trade
+    err
+
+main___algopy_default_create@15:
+    txn OnCompletion
+    !
+    txn ApplicationID
+    !
+    &&
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.create_trade[routing]() -> void:
+create_trade:
+    // smart_contracts/farmer_contract/contract.py:19-20
+    // # ── Step 1: Create Trade ──────────────────────────────
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_2 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    txna ApplicationArgs 2
+    dup
+    len
+    pushint 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 3
+    dup
+    len
+    pushint 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 4
+    dup
+    len
+    intc_3 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    txna ApplicationArgs 5
+    dup
+    len
+    intc_3 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/farmer_contract/contract.py:29
+    // self.trade_id = trade_id
+    pushbytes "trade_id"
+    uncover 5
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:30
+    // self.buyer_address = Txn.sender
+    bytec_1 // "buyer_address"
+    txn Sender
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:31
+    // self.farmer_address = farmer
+    bytec_2 // "farmer_address"
+    uncover 4
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:32
+    // self.verifier_address = verifier
+    bytec 6 // "verifier_address"
+    uncover 3
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:33
+    // self.amount = amount
+    bytec_3 // "amount"
+    uncover 2
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:34
+    // self.delivery_deadline = deadline
+    bytec 7 // "delivery_deadline"
+    swap
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:35
+    // self.state = UInt64(0)
+    bytec_0 // "state"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:36
+    // self.dispute_votes_farmer = UInt64(0)
+    bytec 4 // "dispute_votes_farmer"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:37
+    // self.dispute_votes_buyer = UInt64(0)
+    bytec 5 // "dispute_votes_buyer"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:19-20
+    // # ── Step 1: Create Trade ──────────────────────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.fund_escrow[routing]() -> void:
+fund_escrow:
+    // smart_contracts/farmer_contract/contract.py:42
+    // assert self.state == UInt64(0), "Not in CREATED state"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    !
+    assert // Not in CREATED state
+    // smart_contracts/farmer_contract/contract.py:43
+    // assert Txn.sender == self.buyer_address, "Only buyer can fund"
+    txn Sender
+    intc_0 // 0
+    bytec_1 // "buyer_address"
+    app_global_get_ex
+    assert // check self.buyer_address exists
+    ==
+    assert // Only buyer can fund
+    // smart_contracts/farmer_contract/contract.py:44
+    // self.state = UInt64(1)
+    bytec_0 // "state"
+    intc_1 // 1
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:39-40
+    // # ── Step 2: Fund Escrow ───────────────────────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.mark_delivered[routing]() -> void:
+mark_delivered:
+    // smart_contracts/farmer_contract/contract.py:49
+    // assert Txn.sender == self.farmer_address, "Only farmer can mark"
+    txn Sender
+    intc_0 // 0
+    bytec_2 // "farmer_address"
+    app_global_get_ex
+    assert // check self.farmer_address exists
+    ==
+    assert // Only farmer can mark
+    // smart_contracts/farmer_contract/contract.py:50
+    // assert self.state == UInt64(1), "Not in FUNDED state"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    intc_1 // 1
+    ==
+    assert // Not in FUNDED state
+    // smart_contracts/farmer_contract/contract.py:51
+    // self.state = UInt64(2)
+    bytec_0 // "state"
+    intc_2 // 2
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:46-47
+    // # ── Step 3: Mark Delivered ────────────────────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.confirm_delivery[routing]() -> void:
+confirm_delivery:
+    // smart_contracts/farmer_contract/contract.py:56
+    // assert Txn.sender == self.verifier_address, "Only verifier can confirm"
+    txn Sender
+    intc_0 // 0
+    bytec 6 // "verifier_address"
+    app_global_get_ex
+    assert // check self.verifier_address exists
+    ==
+    assert // Only verifier can confirm
+    // smart_contracts/farmer_contract/contract.py:57
+    // assert self.state == UInt64(2), "Not in DELIVERED state"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    intc_2 // 2
+    ==
+    assert // Not in DELIVERED state
+    // smart_contracts/farmer_contract/contract.py:59-62
+    // itxn.Payment(
+    //     receiver=self.farmer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_begin
+    // smart_contracts/farmer_contract/contract.py:60
+    // receiver=self.farmer_address,
+    intc_0 // 0
+    bytec_2 // "farmer_address"
+    app_global_get_ex
+    assert // check self.farmer_address exists
+    // smart_contracts/farmer_contract/contract.py:61
+    // amount=self.amount,
+    intc_0 // 0
+    bytec_3 // "amount"
+    app_global_get_ex
+    assert // check self.amount exists
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/farmer_contract/contract.py:59
+    // itxn.Payment(
+    intc_1 // pay
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/farmer_contract/contract.py:59-62
+    // itxn.Payment(
+    //     receiver=self.farmer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_submit
+    // smart_contracts/farmer_contract/contract.py:64
+    // self.state = UInt64(3)
+    bytec_0 // "state"
+    pushint 3
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:53-54
+    // # ── Step 4: Confirm Delivery & Release Payment ───────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.raise_dispute[routing]() -> void:
+raise_dispute:
+    // smart_contracts/farmer_contract/contract.py:69
+    // assert Txn.sender == self.buyer_address, "Only buyer can dispute"
+    txn Sender
+    intc_0 // 0
+    bytec_1 // "buyer_address"
+    app_global_get_ex
+    assert // check self.buyer_address exists
+    ==
+    assert // Only buyer can dispute
+    // smart_contracts/farmer_contract/contract.py:70
+    // assert (self.state == UInt64(1)) or (self.state == UInt64(2)), \
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    intc_1 // 1
+    ==
+    bnz raise_dispute_bool_true@3
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    intc_2 // 2
+    ==
+    bz raise_dispute_bool_false@4
+
+raise_dispute_bool_true@3:
+    intc_1 // 1
+
+raise_dispute_bool_merge@5:
+    // smart_contracts/farmer_contract/contract.py:70-71
+    // assert (self.state == UInt64(1)) or (self.state == UInt64(2)), \
+    //     "Can only dispute when FUNDED or DELIVERED"
+    assert // Can only dispute when FUNDED or DELIVERED
+    // smart_contracts/farmer_contract/contract.py:72
+    // self.state = UInt64(4)
+    bytec_0 // "state"
+    pushint 4
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:73
+    // self.dispute_votes_farmer = UInt64(0)
+    bytec 4 // "dispute_votes_farmer"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:74
+    // self.dispute_votes_buyer = UInt64(0)
+    bytec 5 // "dispute_votes_buyer"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:66-67
+    // # ── Step 5: Raise Dispute ─────────────────────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+raise_dispute_bool_false@4:
+    intc_0 // 0
+    b raise_dispute_bool_merge@5
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.vote_dispute[routing]() -> void:
+vote_dispute:
+    // smart_contracts/farmer_contract/contract.py:76-77
+    // # ── Step 6: Vote on Dispute ───────────────────────────
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    len
+    intc_3 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/farmer_contract/contract.py:79
+    // assert self.state == UInt64(4), "Not in DISPUTED state"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    pushint 4
+    ==
+    assert // Not in DISPUTED state
+    // smart_contracts/farmer_contract/contract.py:80-81
+    // # In production: check sender is in dispute_validators list
+    // if vote_for_farmer == UInt64(1):
+    intc_1 // 1
+    ==
+    bz vote_dispute_else_body@3
+    // smart_contracts/farmer_contract/contract.py:82
+    // self.dispute_votes_farmer += UInt64(1)
+    intc_0 // 0
+    bytec 4 // "dispute_votes_farmer"
+    app_global_get_ex
+    assert // check self.dispute_votes_farmer exists
+    intc_1 // 1
+    +
+    bytec 4 // "dispute_votes_farmer"
+    swap
+    app_global_put
+
+vote_dispute_after_if_else@4:
+    // smart_contracts/farmer_contract/contract.py:86-87
+    // # Auto-resolve on majority (2 out of 3)
+    // if self.dispute_votes_farmer >= UInt64(2):
+    intc_0 // 0
+    bytec 4 // "dispute_votes_farmer"
+    app_global_get_ex
+    assert // check self.dispute_votes_farmer exists
+    intc_2 // 2
+    >=
+    bz vote_dispute_after_if_else@7
+    // smart_contracts/farmer_contract/contract.py:88-91
+    // itxn.Payment(
+    //     receiver=self.farmer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_begin
+    // smart_contracts/farmer_contract/contract.py:89
+    // receiver=self.farmer_address,
+    intc_0 // 0
+    bytec_2 // "farmer_address"
+    app_global_get_ex
+    assert // check self.farmer_address exists
+    // smart_contracts/farmer_contract/contract.py:90
+    // amount=self.amount,
+    intc_0 // 0
+    bytec_3 // "amount"
+    app_global_get_ex
+    assert // check self.amount exists
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/farmer_contract/contract.py:88
+    // itxn.Payment(
+    intc_1 // pay
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/farmer_contract/contract.py:88-91
+    // itxn.Payment(
+    //     receiver=self.farmer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_submit
+    // smart_contracts/farmer_contract/contract.py:92
+    // self.state = UInt64(3)  # RELEASED to farmer
+    bytec_0 // "state"
+    pushint 3
+    app_global_put
+
+vote_dispute_after_if_else@7:
+    // smart_contracts/farmer_contract/contract.py:94
+    // if self.dispute_votes_buyer >= UInt64(2):
+    intc_0 // 0
+    bytec 5 // "dispute_votes_buyer"
+    app_global_get_ex
+    assert // check self.dispute_votes_buyer exists
+    intc_2 // 2
+    >=
+    bz vote_dispute_after_if_else@10
+    // smart_contracts/farmer_contract/contract.py:95-98
+    // itxn.Payment(
+    //     receiver=self.buyer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_begin
+    // smart_contracts/farmer_contract/contract.py:96
+    // receiver=self.buyer_address,
+    intc_0 // 0
+    bytec_1 // "buyer_address"
+    app_global_get_ex
+    assert // check self.buyer_address exists
+    // smart_contracts/farmer_contract/contract.py:97
+    // amount=self.amount,
+    intc_0 // 0
+    bytec_3 // "amount"
+    app_global_get_ex
+    assert // check self.amount exists
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/farmer_contract/contract.py:95
+    // itxn.Payment(
+    intc_1 // pay
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/farmer_contract/contract.py:95-98
+    // itxn.Payment(
+    //     receiver=self.buyer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_submit
+    // smart_contracts/farmer_contract/contract.py:99
+    // self.state = UInt64(5)  # Resolve to buyer (EXPIRED/refund)
+    bytec_0 // "state"
+    pushint 5
+    app_global_put
+
+vote_dispute_after_if_else@10:
+    // smart_contracts/farmer_contract/contract.py:76-77
+    // # ── Step 6: Vote on Dispute ───────────────────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+vote_dispute_else_body@3:
+    // smart_contracts/farmer_contract/contract.py:84
+    // self.dispute_votes_buyer += UInt64(1)
+    intc_0 // 0
+    bytec 5 // "dispute_votes_buyer"
+    app_global_get_ex
+    assert // check self.dispute_votes_buyer exists
+    intc_1 // 1
+    +
+    bytec 5 // "dispute_votes_buyer"
+    swap
+    app_global_put
+    b vote_dispute_after_if_else@4
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.claim_refund[routing]() -> void:
+claim_refund:
+    // smart_contracts/farmer_contract/contract.py:104
+    // assert self.state == UInt64(1), "Must be FUNDED"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    intc_1 // 1
+    ==
+    assert // Must be FUNDED
+    // smart_contracts/farmer_contract/contract.py:105
+    // assert Global.latest_timestamp > self.delivery_deadline, "Deadline not passed"
+    global LatestTimestamp
+    intc_0 // 0
+    bytec 7 // "delivery_deadline"
+    app_global_get_ex
+    assert // check self.delivery_deadline exists
+    >
+    assert // Deadline not passed
+    // smart_contracts/farmer_contract/contract.py:106
+    // assert Txn.sender == self.buyer_address, "Only buyer can refund"
+    txn Sender
+    intc_0 // 0
+    bytec_1 // "buyer_address"
+    app_global_get_ex
+    assert // check self.buyer_address exists
+    swap
+    dig 1
+    ==
+    assert // Only buyer can refund
+    // smart_contracts/farmer_contract/contract.py:108-111
+    // itxn.Payment(
+    //     receiver=self.buyer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_begin
+    // smart_contracts/farmer_contract/contract.py:110
+    // amount=self.amount,
+    intc_0 // 0
+    bytec_3 // "amount"
+    app_global_get_ex
+    assert // check self.amount exists
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/farmer_contract/contract.py:108
+    // itxn.Payment(
+    intc_1 // pay
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/farmer_contract/contract.py:108-111
+    // itxn.Payment(
+    //     receiver=self.buyer_address,
+    //     amount=self.amount,
+    // ).submit()
+    itxn_submit
+    // smart_contracts/farmer_contract/contract.py:113
+    // self.state = UInt64(5)
+    bytec_0 // "state"
+    pushint 5
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:101-102
+    // # ── Step 7: Claim Refund (after deadline) ─────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+
+// smart_contracts.farmer_contract.contract.FarmerContract.cancel_trade[routing]() -> void:
+cancel_trade:
+    // smart_contracts/farmer_contract/contract.py:118
+    // assert self.state == UInt64(0), "Can only cancel CREATED trades"
+    intc_0 // 0
+    bytec_0 // "state"
+    app_global_get_ex
+    assert // check self.state exists
+    !
+    assert // Can only cancel CREATED trades
+    // smart_contracts/farmer_contract/contract.py:119
+    // assert (Txn.sender == self.buyer_address) or \
+    txn Sender
+    intc_0 // 0
+    bytec_1 // "buyer_address"
+    app_global_get_ex
+    assert // check self.buyer_address exists
+    ==
+    // smart_contracts/farmer_contract/contract.py:119-120
+    // assert (Txn.sender == self.buyer_address) or \
+    //        (Txn.sender == self.farmer_address), \
+    bnz cancel_trade_bool_true@3
+    // smart_contracts/farmer_contract/contract.py:120
+    // (Txn.sender == self.farmer_address), \
+    txn Sender
+    intc_0 // 0
+    bytec_2 // "farmer_address"
+    app_global_get_ex
+    assert // check self.farmer_address exists
+    ==
+    // smart_contracts/farmer_contract/contract.py:119-120
+    // assert (Txn.sender == self.buyer_address) or \
+    //        (Txn.sender == self.farmer_address), \
+    bz cancel_trade_bool_false@4
+
+cancel_trade_bool_true@3:
+    intc_1 // 1
+
+cancel_trade_bool_merge@5:
+    // smart_contracts/farmer_contract/contract.py:119-121
+    // assert (Txn.sender == self.buyer_address) or \
+    //        (Txn.sender == self.farmer_address), \
+    //     "Only buyer or farmer can cancel"
+    assert // Only buyer or farmer can cancel
+    // smart_contracts/farmer_contract/contract.py:122
+    // self.state = UInt64(6)
+    bytec_0 // "state"
+    pushint 6
+    app_global_put
+    // smart_contracts/farmer_contract/contract.py:115-116
+    // # ── Step 8: Cancel Trade (unfunded only) ──────────────
+    // @abimethod()
+    intc_1 // 1
+    return
+
+cancel_trade_bool_false@4:
+    intc_0 // 0
+    b cancel_trade_bool_merge@5
